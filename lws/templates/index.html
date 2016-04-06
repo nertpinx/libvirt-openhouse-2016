@@ -49,13 +49,26 @@
 	{% raw %}
 	<div ng-controller="lwsCtrl">
 
-	  <div class="starter-error">
+	  <div class="alert alert-danger" role="alert" ng-show="errorText">
 	    {{ errorText }}
 	  </div>
 
-	  <div ng-repeat="domain in domains | orderBy : 'name'">
-	    <div class="animate-repeat">
-	      {{ domain.name + ": " + domain.state }}
+	  <div class="row">
+	    <div class="col-sm-6" ng-repeat="(name, domain) in domains">
+	      <div class="panel panel-success">
+
+		<div class="panel-heading">
+		  <strong>{{ name }}</strong>
+		</div>
+		<div class="panel-body">
+		  <p ng-repeat="(key, value) in domain.info">
+		    {{ key }}: {{ value }}
+		  </div>
+		  <button type="button" class="btn btn-success" ng-repeat="button in buttons" ng-click="doAction(button.action, name)">
+		    {{ button.name }}
+		  </button>
+		</div>
+	      </div>
 	    </div>
 	  </div>
 	</div>

@@ -13,7 +13,7 @@ xml = """
   <memory unit='KiB'>131072</memory>
   <vcpu placement='static'>1</vcpu>
   <os>
-    <type arch='i386' machine='pc'>hvm</type>
+    <type arch='x86_64' machine='pc'>hvm</type>
   </os>
   <devices>
     <memballoon model='none'/>
@@ -26,7 +26,7 @@ d = None
 ret = 0
 
 try:
-    d = c.define(xml)
+    d = c.defineXML(xml)
     print("Domain %s created successfully" % sys.argv[1])
 except (libvirt.libvirtError) as e:
     print("Cannot create domain")

@@ -14,20 +14,40 @@ conn = libvirt.open()
 
 @app.route('/')
 def index():
-    return render_template('index.html', path=os.path.abspath(os.path.dirname(__file__)))
+    return render_template('index.html')
 
 @app.route('/list')
 def list():
     doms = conn.listAllDomains()
-    out = []
+    out = {}
     for dom in doms:
-        out.append({ 'name' : dom.name(),
-                     'state' : state_str(dom) })
+        out[dom.name()] = { 'info' : { 'status' : state_str(dom) }}
     return jsonify({"domains" : out})
 
-@app.route('/start')
-def start_vm():
+@app.route('/do/<action>')
+def doAction(action):
     name = request.args.get('name')
+    ret = {};
+
     if not name:
-        return "404"
-    return jsonify({ 'started' : name })
+        return jsonify({ 'error' : 'Missing argument "name"' });
+
+    try:
+        dom = conn.lookupByName(name)
+        attr = getattr(dom, action, None);
+
+        if not attr:
+            ret = { 'error' : 'Unsupported action "%s"' % action }
+        elif action == 'interfaceAddresses':
+            for inet, data in attr(libvirt.VIR_DOMAIN_INTERFACE_ADDRESSES_SRC_LEASE).items():
+                ret = { 'update' : { name : { 'info' : { 'address' : data['addrs'][0]['addr']}}}}
+                break
+            if not ret:
+                ret = { 'error' : 'No address found for domain "%s"' % name }
+        else:
+            attr()
+            ret = { 'update' : { name : { 'info' : {'status' : state_str(dom) }}}}
+    except (libvirt.libvirtError) as e:
+        ret = { 'error' : str(e) }
+
+    return jsonify(ret)
