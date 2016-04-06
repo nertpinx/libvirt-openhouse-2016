@@ -6,30 +6,9 @@ import os
 import flask
 from flask.ext.script import Manager, Command
 
-from virt_web import app
-from virt_web import db
-
-
-class CreateDBCommand(Command):
-    'Create DB and tables'
-    def run(self, alembic_ini=None):
-        if flask.current_app.config['SQLALCHEMY_DATABASE_URI'].startswith('sqlite'):
-            # strip sqlite:///
-            datadir_name = os.path.dirname(
-                flask.current_app.config['SQLALCHEMY_DATABASE_URI'][len('sqlite:///'):])
-            if not os.path.exists(datadir_name):
-                os.makedirs(datadir_name)
-        db.create_all()
-
-
-class DropDBCommand(Command):
-    'Drop DB tables'
-    def run(self):
-        db.drop_all()
+from lws.app import app
 
 manager = Manager(app)
-manager.add_command('create_db', CreateDBCommand())
-manager.add_command('drop_db', DropDBCommand())
 
 if __name__ == '__main__':
     manager.run()

@@ -8,4 +8,4 @@ logging.basicConfig(stream=sys.stderr)
 
 sys.path.insert(0, os.path.dirname(__file__))
 
-from lvsandbox.app import app as application
+from lws.app import app as application
